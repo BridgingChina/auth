@@ -4,6 +4,12 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-04-01",
   "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAC_mtkcMlH1MGDKs",
+    "BETTER_AUTH_URL": "https://auth.bridgingchina.net",
+    "WEB_ORIGIN": "https://bridgingchina.net",
+    "CONSOLE_ORIGIN": "https://console.bridgingchina.net"
+  },
   "d1_databases": [
     {
       "binding": "AUTH_DB",
