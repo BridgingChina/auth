@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "bridgingchina-auth",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "AUTH_DB",
+      "database_name": "bridgingchina-auth",
+      "database_id": "6afced06-3d0e-428d-85ed-01ca42c09424"
+    }
+  ],
+  "routes": [
+    { "pattern": "auth.bridgingchina.net/*", "custom_domain": true }
+  ]
+}
