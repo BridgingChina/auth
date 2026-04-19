@@ -44,11 +44,10 @@ export function createAuth(env: Env) {
     trustedOrigins: [env.BETTER_AUTH_URL, env.WEB_ORIGIN, env.CONSOLE_ORIGIN],
     advanced: {
       crossSubDomainCookies: { enabled: true, domain: ".bridgingchina.net" },
-      useSecureCookies: true,
+      useSecureCookies: env.BETTER_AUTH_URL.startsWith("https://"),
     },
     user: {
       additionalFields: {
-        username: { type: "string", required: false, unique: true },
         role: { type: "string", required: true, defaultValue: "user" },
         isActive: { type: "boolean", required: true, defaultValue: true },
         passwordChangedAt: { type: "date", required: false },
@@ -59,6 +58,7 @@ export function createAuth(env: Env) {
       enabled: true,
       requireEmailVerification: true,
       minPasswordLength: 12,
+      resetPasswordTokenExpiresIn: 900,
       sendResetPassword: async ({ user, url }) => {
         await sendEmail({
           to: user.email,
@@ -69,6 +69,7 @@ export function createAuth(env: Env) {
       },
     },
     emailVerification: {
+      expiresIn: 900,
       sendOnSignUp: true,
       sendVerificationEmail: async ({ user, url }) => {
         await sendEmail({
@@ -101,7 +102,7 @@ export function createAuth(env: Env) {
       captcha({
         provider: "cloudflare-turnstile",
         secretKey: env.TURNSTILE_SECRET_KEY,
-        endpoints: ["/sign-up/email", "/sign-in/email", "/sign-in/username", "/forget-password"],
+        endpoints: ["/sign-up/email", "/sign-in/email", "/sign-in/username", "/request-password-reset"],
       }),
     ],
     rateLimit: {
@@ -111,7 +112,7 @@ export function createAuth(env: Env) {
       storage: "database",
       customRules: {
         "/sign-up/email": { window: 3600, max: 5 },
-        "/forget-password": { window: 3600, max: 3 },
+        "/request-password-reset": { window: 3600, max: 3 },
       },
     },
   });
