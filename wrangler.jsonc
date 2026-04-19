@@ -12,6 +12,6 @@
     }
   ],
   "routes": [
-    { "pattern": "auth.bridgingchina.net/*", "custom_domain": true }
+    { "pattern": "auth.bridgingchina.net", "custom_domain": true }
   ]
 }
