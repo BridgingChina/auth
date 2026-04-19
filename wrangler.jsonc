@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
   "name": "bridgingchina-auth",
-  "main": "src/index.ts",
+  "main": "src/index.tsx",
   "compatibility_date": "2026-04-01",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
@@ -20,5 +20,9 @@
   ],
   "routes": [
     { "pattern": "auth.bridgingchina.net", "custom_domain": true }
-  ]
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  }
 }
