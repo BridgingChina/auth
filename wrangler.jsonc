@@ -14,7 +14,8 @@
     {
       "binding": "AUTH_DB",
       "database_name": "bridgingchina-auth",
-      "database_id": "6afced06-3d0e-428d-85ed-01ca42c09424"
+      "database_id": "6afced06-3d0e-428d-85ed-01ca42c09424",
+      "migrations_dir": "drizzle"
     }
   ],
   "routes": [
