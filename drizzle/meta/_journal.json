@@ -8,6 +8,13 @@
       "when": 1776580681999,
       "tag": "0000_mature_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1776581173661,
+      "tag": "0001_nasty_warbound",
+      "breakpoints": true
     }
   ]
 }
