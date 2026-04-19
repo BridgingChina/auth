@@ -8,3 +8,4 @@ dist
 .env.*
 !.env.example
 !.dev.vars.example
+scripts/migrate_admins.sql
