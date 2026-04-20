@@ -63,11 +63,12 @@ auth/
 
 1. **身份唯一出口**：所有"谁在操作"的判断来自 `auth/` 签的 JWT，FastAPI 不再自签。改 FastAPI 的 `/api/v1/auth/login` 时注意这个是老代码（Phase 2 会被删）。
 2. **不要共用 D1 和 Postgres**：auth 用 D1，业务数据用 Postgres。跨库一致性走 webhook + cron，不走 FK。
-3. **`/api/auth/*` 路径对齐 Better Auth 1.6 源码**：历史上有两次因计划文档写错路径（`/forget-password` 应为 `/request-password-reset`，`better-auth/plugins/captcha` 不是 export）导致安全 bug。**写端点前去 `node_modules/better-auth/dist/` grep 验证**。
+3. **`/api/auth/*` 路径对齐 Better Auth 1.6 源码**：历史上有三次因上游文档 / 计划文档 / in-file 注释与源码不符导致的 bug：(a) `/forget-password` 应为 `/request-password-reset`；(b) `better-auth/plugins/captcha` 不是 subpath export，要走 aggregator `better-auth/plugins`；(c) `jwt({ jwt: { definePayload } })` **替换** payload，不是合并 —— 见 `node_modules/better-auth/dist/plugins/jwt/sign.mjs:53`：`payload = await options.jwt.definePayload(ctx.context.session)`，plugin 之后只补 `sub/iat/iss/aud/exp`，`email/name/emailVerified/isActive/...` 全部丢。FastAPI `CurrentUser.from_payload` 会因 `payload["email"]` KeyError 一律 401。definePayload 要 spread `ctx.user` 打底再覆盖新字段。**写配置前去 `node_modules/better-auth/dist/` grep 验证**。
 4. **tsconfig `strict + skipLibCheck`**：`skipLibCheck` 不能关，否则 Better Auth 的 d.ts 和 Drizzle 的 d.ts 互相踩到会 CI 挂。
 5. **Hono JSX 用 HTML 属性**（`class=`, `for=`, `charSet=`），不是 React 的 `className=` —— IDE 可能提示错，信代码不信 IDE。
 6. **客户端脚本不用 TypeScript**：`public/static/*.js` 是纯浏览器 JS，没 bundler，没 imports。要共享逻辑就在 server 端插 data-attrs 传进去。
 7. **Captcha token 走 `x-captcha-response` HEADER 不是 body**：Better Auth's captcha plugin 读 header。写新客户端脚本必须遵守。
+8. **JWT payload 契约是跨仓共识**：FastAPI `app/models/current_user.py::from_payload` 当前硬依赖 `sub` + `email`；可选读 `role/emailVerified/username/name/isActive`。auth 仓改 `definePayload` 或 `user.additionalFields` 时必须同步 grep FastAPI 的 payload 读取点，否则生产 401 雪崩（每个请求都挂，不是偶发）。
 
 ## Commands（速查）
 
