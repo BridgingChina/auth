@@ -51,6 +51,14 @@ export function createAuth(env: Env) {
         role: { type: "string", required: true, defaultValue: "user" },
         isActive: { type: "boolean", required: true, defaultValue: true },
         passwordChangedAt: { type: "date", required: false },
+        // preferredLocale: surfaced to clients via session.user.preferredLocale and
+        // embedded in JWT payload as `preferred_locale` (see jwt plugin config below)
+        // so FastAPI can localize error messages without a second round-trip.
+        preferredLocale: {
+          type: "string",
+          required: true,
+          defaultValue: "zh-CN",
+        },
       },
       deleteUser: { enabled: true },
     },
@@ -97,6 +105,17 @@ export function createAuth(env: Env) {
           expirationTime: "15m",
           issuer: env.BETTER_AUTH_URL,
           audience: "fastapi",
+          // Extend payload with role + preferred_locale so resource servers (FastAPI)
+          // can authorize + localize without a round-trip to /api/auth/me. The base
+          // payload still includes `sub`, `iss`, `aud`, `exp`, `iat` etc. from the
+          // plugin — definePayload is merged on top, not replacing. See
+          // node_modules/better-auth/dist/plugins/jwt/sign.mjs for merge logic.
+          definePayload: (ctx) => ({
+            role: (ctx.user as { role?: string }).role ?? "user",
+            preferred_locale:
+              (ctx.user as { preferredLocale?: string }).preferredLocale ??
+              "zh-CN",
+          }),
         },
       }),
       captcha({

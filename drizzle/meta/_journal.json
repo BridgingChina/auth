@@ -15,6 +15,13 @@
       "when": 1776581173661,
       "tag": "0001_nasty_warbound",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1776675659414,
+      "tag": "0002_flaky_green_goblin",
+      "breakpoints": true
     }
   ]
 }
