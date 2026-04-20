@@ -106,11 +106,18 @@ export function createAuth(env: Env) {
           issuer: env.BETTER_AUTH_URL,
           audience: "fastapi",
           // Extend payload with role + preferred_locale so resource servers (FastAPI)
-          // can authorize + localize without a round-trip to /api/auth/me. The base
-          // payload still includes `sub`, `iss`, `aud`, `exp`, `iat` etc. from the
-          // plugin — definePayload is merged on top, not replacing. See
-          // node_modules/better-auth/dist/plugins/jwt/sign.mjs for merge logic.
+          // can authorize + localize without a round-trip to /api/auth/me.
+          //
+          // IMPORTANT: Better Auth's jwt plugin REPLACES the payload with whatever
+          // definePayload returns (see node_modules/better-auth/dist/plugins/jwt/sign.mjs:53
+          // — `payload = await options.jwt.definePayload(ctx.context.session)`). The plugin
+          // only re-adds `sub`, `iat`, `iss`, `aud`, `exp` afterwards; every other user
+          // field (email, emailVerified, name, isActive, ...) is dropped unless we
+          // explicitly include it. FastAPI's `CurrentUser.from_payload` reads
+          // `payload["email"]` and will 401 on a payload without it, so we spread the
+          // full user object first and then overlay the two extra claims.
           definePayload: (ctx) => ({
+            ...ctx.user,
             role: (ctx.user as { role?: string }).role ?? "user",
             preferred_locale:
               (ctx.user as { preferredLocale?: string }).preferredLocale ??
