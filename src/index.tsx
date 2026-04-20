@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { createAuth, type Env } from "./auth";
+import { localeMiddleware } from "./middleware/locale";
 import { LoginPage } from "./ui/login";
 import { RegisterPage } from "./ui/register";
 import { ForgotPasswordPage } from "./ui/forgot-password";
@@ -18,6 +19,11 @@ app.use("*", async (c, next) => {
     allowMethods: ["GET", "POST", "OPTIONS"],
   })(c, next);
 });
+
+// Locale middleware runs AFTER CORS so the OPTIONS preflight short-circuit in `cors()`
+// still returns fast (no need to resolve locale for preflights). Sets `c.var.locale`
+// for all downstream handlers.
+app.use("*", localeMiddleware);
 
 app.get("/health", (c) =>
   c.json({ ok: true, service: "auth", version: "0.1.0" })

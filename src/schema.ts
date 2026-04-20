@@ -19,6 +19,10 @@ export const user = sqliteTable("user", {
   role: text("role").notNull().default("user"),
   isActive: integer("isActive", { mode: "boolean" }).notNull().default(true),
   passwordChangedAt: integer("passwordChangedAt", { mode: "timestamp_ms" }),
+  // BCP-47 locale tag. Read by JWT definePayload() so FastAPI and web/ can localize
+  // without a round-trip to /api/auth/me. NOT NULL + default keeps existing rows valid
+  // after ALTER TABLE (SQLite requires constant defaults for added NOT NULL columns).
+  preferredLocale: text("preferred_locale").notNull().default("zh-CN"),
 });
 
 export const session = sqliteTable(
