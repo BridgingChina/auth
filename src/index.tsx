@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { setCookie } from "hono/cookie";
 import { createAuth, type Env } from "./auth";
 import { localeMiddleware } from "./middleware/locale";
+import { preflightMiddleware } from "./middleware/preflight";
 import { LOCALES, type Locale } from "./i18n";
 import { LoginPage } from "./ui/login";
 import { RegisterPage } from "./ui/register";
@@ -13,6 +14,16 @@ import { VerifyEmailPage } from "./ui/verify-email";
 
 const app = new Hono<{ Bindings: Env; Variables: { locale: Locale } }>();
 
+// OPTIONS preflight short-circuit — MUST be the first middleware. Handles
+// preflights with a synchronous, dependency-free path (no locale cookie read,
+// no hono/cors closure rebuild, no Better Auth routing). See issue #3 and
+// src/middleware/preflight.ts for the rationale.
+app.use("*", preflightMiddleware);
+
+// hono/cors now only sees non-OPTIONS requests (preflights are handled above),
+// so its job is reduced to stamping Access-Control-Allow-Origin / Credentials
+// on real responses. OPTIONS is still listed in allowMethods for completeness
+// in case a downstream tool introspects the middleware config.
 app.use("*", async (c, next) => {
   return cors({
     origin: [c.env.WEB_ORIGIN, c.env.CONSOLE_ORIGIN, c.env.BETTER_AUTH_URL],
@@ -22,9 +33,8 @@ app.use("*", async (c, next) => {
   })(c, next);
 });
 
-// Locale middleware runs AFTER CORS so the OPTIONS preflight short-circuit in `cors()`
-// still returns fast (no need to resolve locale for preflights). Sets `c.var.locale`
-// for all downstream handlers.
+// Locale middleware runs AFTER CORS. Never executes on preflights because the
+// preflight middleware above returns a Response without calling next().
 app.use("*", localeMiddleware);
 
 app.get("/health", (c) =>
