@@ -1,19 +1,21 @@
 import type { FC } from "hono/jsx";
 import { Layout } from "./layout";
+import { t, type Locale } from "../i18n";
 
 type Props = {
   siteKey: string;
   webOrigin: string;
   redirectTo?: string;
+  locale: Locale;
 };
 
-export const LoginPage: FC<Props> = ({ siteKey, webOrigin, redirectTo }) => {
+export const LoginPage: FC<Props> = ({ siteKey, webOrigin, redirectTo, locale }) => {
   const resolvedRedirect = redirectTo && redirectTo.length > 0 ? redirectTo : webOrigin;
 
   return (
-    <Layout title="登录" scriptSrc="/static/login.js">
+    <Layout title={t("auth.signin.title", locale)} scriptSrc="/static/login.js" locale={locale}>
       <div class="bg-white rounded-lg shadow-md p-8">
-        <h2 class="text-xl font-semibold text-slate-900 mb-6">登录</h2>
+        <h2 class="text-xl font-semibold text-slate-900 mb-6">{t("auth.signin.heading", locale)}</h2>
         <form
           id="login-form"
           class="space-y-4"
@@ -25,7 +27,7 @@ export const LoginPage: FC<Props> = ({ siteKey, webOrigin, redirectTo }) => {
 
           <div>
             <label for="identifier" class="block text-sm font-medium mb-1">
-              邮箱或用户名
+              {t("auth.signin.identifier_label", locale)}
             </label>
             <input
               id="identifier"
@@ -34,13 +36,13 @@ export const LoginPage: FC<Props> = ({ siteKey, webOrigin, redirectTo }) => {
               required
               autocomplete="username"
               class="w-full border rounded px-3 py-2"
-              placeholder="name@example.com 或 用户名"
+              placeholder={t("auth.signin.identifier_placeholder", locale)}
             />
           </div>
 
           <div>
             <label for="password" class="block text-sm font-medium mb-1">
-              密码
+              {t("auth.signin.password_label", locale)}
             </label>
             <input
               id="password"
@@ -49,7 +51,7 @@ export const LoginPage: FC<Props> = ({ siteKey, webOrigin, redirectTo }) => {
               required
               autocomplete="current-password"
               class="w-full border rounded px-3 py-2"
-              placeholder="至少 12 位"
+              placeholder={t("auth.signin.password_placeholder", locale)}
             />
           </div>
 
@@ -62,22 +64,22 @@ export const LoginPage: FC<Props> = ({ siteKey, webOrigin, redirectTo }) => {
             type="submit"
             class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
           >
-            登录
+            {t("auth.signin.submit", locale)}
           </button>
 
           <a
             href="/auth/magic-link"
             class="block w-full text-center border border-blue-600 text-blue-600 py-2 rounded hover:bg-blue-50"
           >
-            使用 Magic Link 登录
+            {t("auth.signin.magic_link_cta", locale)}
           </a>
 
           <div class="flex justify-between text-sm text-slate-600 pt-2">
             <a href="/auth/forgot-password" class="hover:text-blue-600">
-              忘记密码
+              {t("auth.signin.forgot_password", locale)}
             </a>
             <a href="/auth/register" class="hover:text-blue-600">
-              注册新账户
+              {t("auth.signin.register", locale)}
             </a>
           </div>
         </form>

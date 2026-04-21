@@ -1,17 +1,25 @@
 import type { FC } from "hono/jsx";
 import { Layout } from "./layout";
+import { t, type Locale } from "../i18n";
 
 type Props = {
   siteKey: string;
   webOrigin: string;
+  locale: Locale;
 };
 
-export const MagicLinkPage: FC<Props> = ({ siteKey, webOrigin }) => (
-  <Layout title="Magic Link 登录" scriptSrc="/static/magic-link.js">
+export const MagicLinkPage: FC<Props> = ({ siteKey, webOrigin, locale }) => (
+  <Layout
+    title={t("auth.magic_link.title", locale)}
+    scriptSrc="/static/magic-link.js"
+    locale={locale}
+  >
     <div class="bg-white rounded-lg shadow-md p-8">
-      <h2 class="text-xl font-semibold text-slate-900 mb-2">Magic Link 登录</h2>
+      <h2 class="text-xl font-semibold text-slate-900 mb-2">
+        {t("auth.magic_link.heading", locale)}
+      </h2>
       <p class="text-sm text-slate-600 mb-6">
-        输入注册邮箱，我们会发送一次性登录链接到该邮箱，点击链接即可登录，无需密码。
+        {t("auth.magic_link.description", locale)}
       </p>
 
       <form
@@ -22,7 +30,7 @@ export const MagicLinkPage: FC<Props> = ({ siteKey, webOrigin }) => (
       >
         <div>
           <label for="email" class="block text-sm font-medium mb-1">
-            邮箱
+            {t("auth.magic_link.email_label", locale)}
           </label>
           <input
             id="email"
@@ -44,12 +52,12 @@ export const MagicLinkPage: FC<Props> = ({ siteKey, webOrigin }) => (
           type="submit"
           class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
         >
-          发送登录链接
+          {t("auth.magic_link.submit", locale)}
         </button>
 
         <div class="text-sm text-slate-600 text-center pt-2">
           <a href="/auth/login" class="hover:text-blue-600">
-            返回密码登录
+            {t("auth.magic_link.back_to_password", locale)}
           </a>
         </div>
       </form>
@@ -60,7 +68,7 @@ export const MagicLinkPage: FC<Props> = ({ siteKey, webOrigin }) => (
         </div>
         <div class="pt-4 text-sm text-slate-600 text-center">
           <a href="/auth/login" class="hover:text-blue-600">
-            返回密码登录
+            {t("auth.magic_link.back_to_password", locale)}
           </a>
         </div>
       </div>

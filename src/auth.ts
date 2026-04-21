@@ -11,6 +11,23 @@ import { captcha } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "./schema";
 import { sendEmail } from "./email";
+import {
+  verifyEmailHtml,
+  resetPasswordHtml,
+  magicLinkHtml,
+} from "./email-templates";
+import { t, DEFAULT_LOCALE, LOCALES, type Locale } from "./i18n";
+
+// Better Auth's callbacks receive `user` but not the locale from the request.
+// The user's `preferredLocale` column (populated by Phase 1 schema migration)
+// is the only locale signal available — default to zh-CN when absent or unknown.
+function resolveUserLocale(user: { preferredLocale?: string | null }): Locale {
+  const tag = user.preferredLocale;
+  if (tag && (LOCALES as readonly string[]).includes(tag)) {
+    return tag as Locale;
+  }
+  return DEFAULT_LOCALE;
+}
 
 export type Env = {
   AUTH_DB: D1Database;
@@ -68,10 +85,11 @@ export function createAuth(env: Env) {
       minPasswordLength: 12,
       resetPasswordTokenExpiresIn: 900,
       sendResetPassword: async ({ user, url }) => {
+        const locale = resolveUserLocale(user as unknown as { preferredLocale?: string | null });
         await sendEmail({
           to: user.email,
-          subject: "重置你的桥知账户密码",
-          html: `<p>点击链接重置密码（15 分钟内有效）:</p><p><a href="${url}">${url}</a></p>`,
+          subject: t("email.reset.subject", locale),
+          html: resetPasswordHtml(locale, url),
           apiKey: env.RESEND_API_KEY,
         });
       },
@@ -80,10 +98,11 @@ export function createAuth(env: Env) {
       expiresIn: 900,
       sendOnSignUp: true,
       sendVerificationEmail: async ({ user, url }) => {
+        const locale = resolveUserLocale(user as unknown as { preferredLocale?: string | null });
         await sendEmail({
           to: user.email,
-          subject: "验证你的桥知邮箱",
-          html: `<p>欢迎加入桥知！点此验证邮箱（15 分钟内有效）:</p><p><a href="${url}">${url}</a></p>`,
+          subject: t("email.verify.subject", locale),
+          html: verifyEmailHtml(locale, url),
           apiKey: env.RESEND_API_KEY,
         });
       },
@@ -92,10 +111,16 @@ export function createAuth(env: Env) {
       username(),
       magicLink({
         sendMagicLink: async ({ email, url }) => {
+          // Magic-link callback only gets `email`, not the full user row — so
+          // we can't read preferredLocale here. Default to zh-CN; users who
+          // want English magic-link emails can hit the UI in English first
+          // (which writes NEXT_LOCALE cookie) and register from there to
+          // populate preferredLocale.
+          const locale: Locale = DEFAULT_LOCALE;
           await sendEmail({
             to: email,
-            subject: "桥知 Magic Link 登录",
-            html: `<p>点击下方链接登录（5 分钟内有效）:</p><p><a href="${url}">${url}</a></p>`,
+            subject: t("email.magic.subject", locale),
+            html: magicLinkHtml(locale, url),
             apiKey: env.RESEND_API_KEY,
           });
         },
