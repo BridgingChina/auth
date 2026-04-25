@@ -13,17 +13,17 @@ export const ForgotPasswordPage: FC<Props> = ({ siteKey, locale }) => (
     scriptSrc="/static/forgot-password.js"
     locale={locale}
   >
-    <div class="bg-white rounded-lg shadow-md p-8">
-      <h2 class="text-xl font-semibold text-slate-900 mb-2">
+    <div class="auth-card">
+      <h2 class="text-xl font-semibold text-[#1F1F1E] mb-2">
         {t("auth.forgot_password.heading", locale)}
       </h2>
-      <p class="text-sm text-slate-600 mb-6">
+      <p class="text-sm text-[#6E6B65] mb-6">
         {t("auth.forgot_password.description", locale)}
       </p>
 
       <form id="forgot-form" class="space-y-4" novalidate>
         <div>
-          <label for="email" class="block text-sm font-medium mb-1">
+          <label for="email" class="block text-sm font-medium text-[#1F1F1E] mb-1">
             {t("auth.forgot_password.email_label", locale)}
           </label>
           <input
@@ -32,39 +32,39 @@ export const ForgotPasswordPage: FC<Props> = ({ siteKey, locale }) => (
             type="email"
             required
             autocomplete="email"
-            class="w-full border rounded px-3 py-2"
+            class="ds-input"
             placeholder="name@example.com"
           />
         </div>
 
         <div class="cf-turnstile" data-sitekey={siteKey} data-theme="light"></div>
 
-        <div id="error" class="text-sm text-red-600 hidden"></div>
+        <div id="error" class="ds-field-error hidden"></div>
 
         <button
           id="submit"
           type="submit"
-          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          class="ds-btn-primary"
         >
           {t("auth.forgot_password.submit", locale)}
         </button>
 
-        <div class="flex justify-between text-sm text-slate-600 pt-2">
-          <a href="/auth/login" class="hover:text-blue-600">
+        <div class="flex justify-between pt-1">
+          <a href="/auth/login" class="ds-link">
             {t("auth.forgot_password.back_to_signin", locale)}
           </a>
-          <a href="/auth/register" class="hover:text-blue-600">
+          <a href="/auth/register" class="ds-link">
             {t("auth.forgot_password.register", locale)}
           </a>
         </div>
       </form>
 
       <div id="success" class="hidden">
-        <div class="rounded bg-green-50 border border-green-200 p-4 text-sm text-green-800">
+        <div class="ds-alert-success">
           <p id="success-message"></p>
         </div>
-        <div class="pt-4 text-sm text-slate-600">
-          <a href="/auth/login" class="hover:text-blue-600">
+        <div class="pt-4">
+          <a href="/auth/login" class="ds-link">
             {t("auth.forgot_password.back_to_signin", locale)}
           </a>
         </div>
