@@ -197,6 +197,8 @@ export const Layout: FC<Props> = ({ title, scriptSrc, locale, children }) => (
       <meta charSet="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <title>{`${title} · ${t("layout.brand", locale)}`}</title>
+      <link rel="icon" type="image/png" href="/favicon.png" />
+      <link rel="apple-touch-icon" href="/apple-icon.png" />
       <script src="https://cdn.tailwindcss.com"></script>
       <style dangerouslySetInnerHTML={{ __html: BRAND_TOKENS }} />
       <script
